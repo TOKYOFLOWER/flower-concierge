@@ -388,7 +388,7 @@ body {
       card.className = 'product-card';
       card.innerHTML = '<div class="product-image">' + imageHtml + '</div>'
         + '<div class="product-info">'
-        + '<div class="product-name">' + escapeHtml(p.name) + '</div>'
+        + '<div class="product-name">' + escapeHtml(cleanProductName(p.name)) + '</div>'
         + '<div class="product-price">&yen;' + Number(p.price).toLocaleString() + '</div>'
         + '<div class="product-reason">' + escapeHtml(p.reason || '') + '</div>'
         + linkHtml
@@ -411,6 +411,19 @@ body {
     div.appendChild(btn);
     chat.appendChild(div);
     scrollToBottom();
+  }
+
+  function cleanProductName(name) {
+    return name
+      .replace(/【[^】]*】/g, '')
+      .replace(/\[[^\]]*\]/g, '')
+      .replace(/　/g, ' ')
+      .replace(/\s+/g, ' ')
+      .replace(/送料無料|送料込み|送料別|楽天|あす楽[^\s]*/g, '')
+      .replace(/[0-9]{4}年?/g, '')
+      .replace(/2026|2025/g, '')
+      .trim()
+      .substring(0, 30);
   }
 
   function escapeHtml(str) {
