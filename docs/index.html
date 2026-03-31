@@ -451,11 +451,16 @@ body {
       freeword: ''
     };
 
-    fetch(API_URL, {
-      method: 'POST',
-      redirect: 'follow',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify(payload)
+    var url = new URL(API_URL);
+    url.searchParams.set('purpose', payload.purpose || '');
+    url.searchParams.set('budget', payload.budget || 99999);
+    url.searchParams.set('recipient', payload.recipient || '');
+    url.searchParams.set('category', payload.category || '');
+    url.searchParams.set('freeword', payload.freeword || '');
+
+    fetch(url.toString(), {
+      method: 'GET',
+      redirect: 'follow'
     })
     .then(function(res) { return res.json(); })
     .then(function(data) {
