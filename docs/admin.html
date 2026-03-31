@@ -401,34 +401,40 @@ td { padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.05); font-s
   };
 
   // === Hints ===
+  var HINT_PURPOSES = ['誕生日','記念日・お祝い','開店・開業祝い','お見舞い','母の日・父の日','結婚・出産祝い','就任・栄転祝い','自宅用・インテリア'];
+
   function renderHints() {
-    var allPurposes = ['誕生日','記念日・お祝い','開店・開業祝い','お見舞い','母の日・父の日','結婚・出産祝い','就任・栄転祝い','自宅用・インテリア'];
     var hintMap = {};
-    var hintIdMap = {};
-    rulesData.hints.forEach(function(h) { hintMap[h.purpose] = h.hint; hintIdMap[h.purpose] = h.id; });
+    rulesData.hints.forEach(function(h) { hintMap[h.purpose] = h.hint; });
 
     var html = '<table><tr><th>用途</th><th>現在の指示文</th><th>操作</th></tr>';
-    allPurposes.forEach(function(p) {
+    HINT_PURPOSES.forEach(function(p, idx) {
       var hint = hintMap[p] || '';
-      html += '<tr id="hint-row-' + esc(p) + '"><td>' + esc(p) + '</td>'
+      html += '<tr data-hint-idx="' + idx + '"><td>' + esc(p) + '</td>'
         + '<td class="hint-text">' + (hint ? esc(hint) : '<span style="color:var(--text-muted)">（未設定）</span>') + '</td>'
-        + '<td><button class="btn btn-small btn-gold" onclick="editHint(' + JSON.stringify(p) + ',' + JSON.stringify(hint) + ')">編集</button></td></tr>';
+        + '<td><button class="btn btn-small btn-gold" onclick="editHint(' + idx + ')">編集</button></td></tr>';
     });
     html += '</table>';
     document.getElementById('hintsTable').innerHTML = html;
   }
 
-  window.editHint = function(purpose, current) {
-    var row = document.getElementById('hint-row-' + purpose);
+  window.editHint = function(idx) {
+    var purpose = HINT_PURPOSES[idx];
+    var hintMap = {};
+    rulesData.hints.forEach(function(h) { hintMap[h.purpose] = h.hint; });
+    var current = hintMap[purpose] || '';
+
+    var row = document.querySelector('[data-hint-idx="' + idx + '"]');
     if (!row) return;
     var cells = row.querySelectorAll('td');
-    cells[1].innerHTML = '<div class="hint-edit"><textarea id="hintEdit-' + purpose + '">' + esc(current) + '</textarea></div>';
-    cells[2].innerHTML = '<button class="btn btn-small btn-gold" onclick="saveHint(' + JSON.stringify(purpose) + ')">保存</button> '
+    cells[1].innerHTML = '<div class="hint-edit"><textarea id="hintEdit">' + esc(current) + '</textarea></div>';
+    cells[2].innerHTML = '<button class="btn btn-small btn-gold" onclick="saveHint(' + idx + ')">保存</button> '
       + '<button class="btn btn-small btn-cancel" onclick="renderHints()">キャンセル</button>';
   };
 
-  window.saveHint = function(purpose) {
-    var ta = document.getElementById('hintEdit-' + purpose);
+  window.saveHint = function(idx) {
+    var purpose = HINT_PURPOSES[idx];
+    var ta = document.getElementById('hintEdit');
     if (!ta) return;
     showLoading();
     apiCall({ action: 'save_hint', purpose: purpose, hint: ta.value }, function(data) {
