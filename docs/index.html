@@ -18,6 +18,7 @@
   --gold: #c9a84c;
   --gold-light: #d4b96a;
   --gold-dark: #a88a3a;
+  --ivory: #f8f4ee;
   --text: #f0ede6;
   --text-muted: #b0ab9e;
   --card-bg: #1e331e;
@@ -32,6 +33,19 @@ body {
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
+  position: relative;
+}
+
+/* Background botanical pattern */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300' viewBox='0 0 300 300'%3E%3Cg fill='%23c9a84c' opacity='1'%3E%3Cellipse cx='40' cy='30' rx='8' ry='14' transform='rotate(-20 40 30)'/%3E%3Cellipse cx='55' cy='35' rx='7' ry='12' transform='rotate(15 55 35)'/%3E%3Cpath d='M45 44 Q48 70 50 90' stroke='%23c9a84c' fill='none' stroke-width='1.5'/%3E%3Cellipse cx='250' cy='80' rx='6' ry='10' transform='rotate(-30 250 80)'/%3E%3Cellipse cx='260' cy='75' rx='5' ry='9' transform='rotate(20 260 75)'/%3E%3Cellipse cx='245' cy='72' rx='5' ry='9' transform='rotate(-60 245 72)'/%3E%3Ccircle cx='252' cy='78' r='3'/%3E%3Cpath d='M252 88 Q255 110 253 130' stroke='%23c9a84c' fill='none' stroke-width='1'/%3E%3Cellipse cx='150' cy='160' rx='4' ry='7' transform='rotate(0 150 160)'/%3E%3Cellipse cx='150' cy='160' rx='4' ry='7' transform='rotate(72 150 160)'/%3E%3Cellipse cx='150' cy='160' rx='4' ry='7' transform='rotate(144 150 160)'/%3E%3Cellipse cx='150' cy='160' rx='4' ry='7' transform='rotate(216 150 160)'/%3E%3Cellipse cx='150' cy='160' rx='4' ry='7' transform='rotate(288 150 160)'/%3E%3Ccircle cx='150' cy='165' r='2.5'/%3E%3Cpath d='M150 172 Q152 195 148 220' stroke='%23c9a84c' fill='none' stroke-width='1.2'/%3E%3Cellipse cx='140' cy='190' rx='6' ry='10' transform='rotate(-40 140 190)'/%3E%3Cellipse cx='160' cy='195' rx='5' ry='9' transform='rotate(35 160 195)'/%3E%3Cellipse cx='70' cy='240' rx='5' ry='9' transform='rotate(10 70 240)'/%3E%3Cellipse cx='80' cy='235' rx='4' ry='8' transform='rotate(-25 80 235)'/%3E%3Cpath d='M75 248 Q78 270 76 290' stroke='%23c9a84c' fill='none' stroke-width='1'/%3E%3Cellipse cx='220' cy='260' rx='6' ry='11' transform='rotate(-15 220 260)'/%3E%3Cellipse cx='230' cy='255' rx='5' ry='10' transform='rotate(30 230 255)'/%3E%3Cellipse cx='215' cy='252' rx='5' ry='9' transform='rotate(-50 215 252)'/%3E%3Cpath d='M222 270 Q225 285 220 300' stroke='%23c9a84c' fill='none' stroke-width='1'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 300px 300px;
+  opacity: 0.06;
+  pointer-events: none;
+  z-index: 0;
 }
 
 /* Header */
@@ -39,6 +53,8 @@ body {
   text-align: center;
   padding: 24px 16px 16px;
   border-bottom: 1px solid rgba(201,168,76,0.2);
+  position: relative;
+  z-index: 1;
 }
 .header h1 {
   font-family: 'Noto Serif JP', serif;
@@ -65,6 +81,18 @@ body {
   max-width: 600px;
   width: 100%;
   margin: 0 auto;
+  position: relative;
+  z-index: 1;
+  scroll-behavior: smooth;
+}
+
+/* Concierge icon */
+.concierge-icon {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  overflow: hidden;
 }
 
 /* Message bubbles */
@@ -72,7 +100,7 @@ body {
   display: flex;
   gap: 8px;
   align-items: flex-start;
-  animation: fadeIn 0.3s ease;
+  animation: fadeIn 0.4s ease;
 }
 .message.bot { justify-content: flex-start; }
 .message.user { justify-content: flex-end; }
@@ -94,13 +122,38 @@ body {
   color: var(--gold-light);
 }
 
+/* Seasonal banner */
+.seasonal-banner {
+  background: rgba(201,168,76,0.15);
+  border: 1px solid rgba(201,168,76,0.4);
+  border-radius: 10px;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: background 0.3s;
+  animation: fadeIn 0.5s ease;
+}
+.seasonal-banner:hover {
+  background: rgba(201,168,76,0.25);
+}
+.seasonal-title {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 0.85rem;
+  color: var(--gold);
+  margin-bottom: 4px;
+}
+.seasonal-desc {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
 /* Choice buttons */
 .choices {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
   padding: 4px 0;
-  animation: fadeIn 0.3s ease;
+  animation: fadeIn 0.4s ease;
 }
 .choices button {
   font-family: 'Noto Sans JP', sans-serif;
@@ -111,11 +164,13 @@ body {
   border-radius: 20px;
   font-size: 0.85rem;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.3s;
 }
 .choices button:hover {
   background: var(--gold);
   color: var(--bg);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(201,168,76,0.3);
 }
 
 /* Loading */
@@ -146,7 +201,7 @@ body {
   flex-direction: column;
   gap: 12px;
   padding: 8px 0;
-  animation: fadeIn 0.4s ease;
+  animation: fadeIn 0.5s ease;
 }
 .product-card {
   background: var(--card-bg);
@@ -155,6 +210,10 @@ body {
   overflow: hidden;
   display: flex;
   gap: 0;
+  transition: border-color 0.3s;
+}
+.product-card:hover {
+  border-color: rgba(201,168,76,0.4);
 }
 .product-image {
   width: 110px;
@@ -203,6 +262,27 @@ body {
   color: var(--text-muted);
   line-height: 1.5;
 }
+.flower-language {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin-top: 2px;
+}
+.language-badge {
+  flex-shrink: 0;
+  font-size: 0.65rem;
+  font-weight: 700;
+  background: rgba(201,168,76,0.2);
+  color: var(--gold);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+.language-text {
+  font-size: 0.72rem;
+  color: var(--gold-light);
+  line-height: 1.4;
+  opacity: 0.85;
+}
 .product-link {
   display: inline-block;
   margin-top: auto;
@@ -214,11 +294,12 @@ body {
   font-weight: 700;
   border-radius: 6px;
   text-align: center;
-  transition: background 0.2s;
+  transition: all 0.3s;
   align-self: flex-start;
 }
 .product-link:hover {
   background: var(--gold-light);
+  transform: translateY(-1px);
 }
 
 /* Restart button */
@@ -236,11 +317,78 @@ body {
   border-radius: 24px;
   font-size: 0.9rem;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.3s;
 }
 .restart button:hover {
   background: var(--gold);
   color: var(--bg);
+  transform: translateY(-1px);
+}
+
+/* Case studies gallery */
+.cases-section {
+  padding: 16px 0;
+  animation: fadeIn 0.5s ease;
+}
+.cases-title {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 0.85rem;
+  color: var(--gold);
+  margin-bottom: 10px;
+}
+.cases-scroll {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  -webkit-overflow-scrolling: touch;
+}
+.cases-scroll::-webkit-scrollbar { height: 3px; }
+.cases-scroll::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.3); border-radius: 2px; }
+.case-card {
+  min-width: 200px;
+  max-width: 200px;
+  background: var(--card-bg);
+  border: 1px solid rgba(201,168,76,0.15);
+  border-radius: 10px;
+  padding: 14px;
+  flex-shrink: 0;
+}
+.case-emoji {
+  font-size: 1.5rem;
+  margin-bottom: 6px;
+}
+.case-title {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+  line-height: 1.4;
+}
+.case-desc {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+.case-tag {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 0.65rem;
+  background: rgba(201,168,76,0.15);
+  color: var(--gold);
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+/* Petal effect */
+.petal {
+  position: fixed;
+  top: -20px;
+  border-radius: 50% 0 50% 0;
+  opacity: 0.8;
+  pointer-events: none;
+  z-index: 9999;
+  animation: petalFall linear forwards;
 }
 
 @keyframes fadeIn {
@@ -251,11 +399,21 @@ body {
   0%, 60%, 100% { transform: translateY(0); }
   30% { transform: translateY(-6px); }
 }
+@keyframes petalFall {
+  0% { transform: translateY(0) rotate(0deg); opacity: 0.8; }
+  100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+}
 
 /* Scrollbar */
 .chat-container::-webkit-scrollbar { width: 4px; }
 .chat-container::-webkit-scrollbar-track { background: transparent; }
 .chat-container::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.3); border-radius: 2px; }
+
+@media (max-width: 480px) {
+  .product-image { width: 90px; min-height: 110px; }
+  .case-card { min-width: 170px; max-width: 170px; }
+  .concierge-icon { width: 30px; height: 30px; }
+}
 </style>
 </head>
 <body>
@@ -302,9 +460,67 @@ body {
     '30,000円以上': 99999
   };
 
+  var seasonalFlowers = {
+    1: { name: '胡蝶蘭', desc: '新年のお祝いに。格調高い純白の胡蝶蘭。', emoji: '🌸' },
+    2: { name: 'チューリップ', desc: 'バレンタインに。春の訪れを告げる華やかな色彩。', emoji: '🌷' },
+    3: { name: '桜・スイートピー', desc: '卒業・入学のシーズンに。淡いピンクが春を彩ります。', emoji: '🌸' },
+    4: { name: 'バラ', desc: '新生活のお祝いに。季節を問わず愛される花の女王。', emoji: '🌹' },
+    5: { name: 'カーネーション', desc: '母の日に。感謝の気持ちを真っ赤なカーネーションで。', emoji: '💐' },
+    6: { name: 'ひまわり・アジサイ', desc: '梅雨から夏へ。明るく元気なひまわりで笑顔を届けます。', emoji: '🌻' },
+    7: { name: 'ひまわり', desc: '夏の贈り物に。太陽のような黄色が夏を演出。', emoji: '🌻' },
+    8: { name: 'トルコキキョウ', desc: 'お盆・お供えに。清楚で上品な白・紫のお花。', emoji: '💜' },
+    9: { name: 'リンドウ・ダリア', desc: '秋の彩りに。深みのある色合いが季節を感じさせます。', emoji: '🌺' },
+    10: { name: 'バラ・コスモス', desc: '秋の記念日に。深紅のバラとやさしいコスモス。', emoji: '🌹' },
+    11: { name: 'バラ・シクラメン', desc: '勤労感謝に。温かみのある色合いで気持ちを伝えます。', emoji: '🌷' },
+    12: { name: 'ポインセチア・バラ', desc: 'クリスマス・年末に。赤と白で華やかな季節の彩りを。', emoji: '🎄' }
+  };
+
+  var flowerLanguage = {
+    'バラ': { general: '愛と美の象徴。本数にも意味があります。' },
+    'カーネーション': { general: '母への愛・感謝。赤は愛情、ピンクは感謝を表します。' },
+    '胡蝶蘭': { general: '幸福が飛んでくる。開店・開業祝いに最適な縁起の良い花です。' },
+    'ユリ': { general: '純粋・無垢。白ユリは特に気品があり、大切な方への贈り物に。' },
+    'チューリップ': { general: '思いやり・博愛。色によって恋の告白・永遠の愛の意味も。' },
+    'ひまわり': { general: 'あなただけを見つめる。明るく元気な気持ちを伝えられます。' },
+    'アジサイ': { general: '家族の幸福・和気あいあい。青は辛抱強い愛情を表します。' },
+    'スイートピー': { general: '門出・優しい思い出。春の門出を祝うのにぴったりな花。' },
+    'ガーベラ': { general: '希望・常に前進。明るくポップな色が元気を与えてくれます。' }
+  };
+
+  var caseStudies = [
+    { emoji: '💍', title: 'プロポーズに100本のバラ',
+      desc: '30代男性。「一生忘れられない瞬間にしたい」というご要望に、深紅のバラ100本の花束をご提案。',
+      tag: '記念日' },
+    { emoji: '🏢', title: '開店祝いに白の胡蝶蘭3本立て',
+      desc: '銀座のレストランオープンに。立派な胡蝶蘭がお店の格を一段上げてくれました。',
+      tag: '開店祝い' },
+    { emoji: '👩', title: '母の日にカーネーションのアレンジ',
+      desc: '「毎年同じでは…」というお声に、赤とピンクのグラデーションアレンジをご提案。',
+      tag: '母の日' },
+    { emoji: '🎂', title: '誕生日サプライズに花束＋ワイン',
+      desc: 'パートナーへのサプライズに。バラの花束とスパークリングワインのセットが大好評。',
+      tag: '誕生日' },
+    { emoji: '🏥', title: 'お見舞いに明るいひまわりブーケ',
+      desc: '「元気づけたい」という気持ちに。黄色いひまわりの小さなブーケで笑顔をお届け。',
+      tag: 'お見舞い' },
+    { emoji: '🎓', title: '卒業祝いにスイートピーの花束',
+      desc: '大学卒業のお嬢様に。春色のスイートピーと共に新しい門出をお祝い。',
+      tag: '記念日' }
+  ];
+
   var chat = document.getElementById('chat');
   var currentStep = 0;
   var answers = {};
+
+  var CONCIERGE_ICON = '<svg class="concierge-icon" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">'
+    + '<circle cx="20" cy="20" r="20" fill="#c9a84c"/>'
+    + '<ellipse cx="20" cy="12" rx="3" ry="6" fill="white" transform="rotate(0 20 20)"/>'
+    + '<ellipse cx="20" cy="12" rx="3" ry="6" fill="white" transform="rotate(72 20 20)"/>'
+    + '<ellipse cx="20" cy="12" rx="3" ry="6" fill="white" transform="rotate(144 20 20)"/>'
+    + '<ellipse cx="20" cy="12" rx="3" ry="6" fill="white" transform="rotate(216 20 20)"/>'
+    + '<ellipse cx="20" cy="12" rx="3" ry="6" fill="white" transform="rotate(288 20 20)"/>'
+    + '<circle cx="20" cy="20" r="4" fill="#c9a84c"/>'
+    + '</svg>';
 
   var FLOWER_SVG = '<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">'
     + '<path d="M24 40V24" stroke="#c9a84c" stroke-width="2" stroke-linecap="round"/>'
@@ -318,10 +534,39 @@ body {
     + '<ellipse cx="29" cy="22" rx="3.5" ry="5" transform="rotate(90 29 22)" fill="#c9a84c" opacity="0.3"/>'
     + '</svg>';
 
+  // === Petal effect ===
+  function createPetalEffect() {
+    var colors = ['#c9a84c', '#e8b4b8', '#f4d4d4', '#d4a843', '#f0c8b0'];
+    for (var i = 0; i < 12; i++) {
+      var petal = document.createElement('div');
+      petal.className = 'petal';
+      petal.style.cssText = [
+        'left:' + (Math.random() * 100) + 'vw',
+        'animation-duration:' + (1 + Math.random()) + 's',
+        'animation-delay:' + (Math.random() * 0.5) + 's',
+        'background:' + colors[Math.floor(Math.random() * colors.length)],
+        'width:' + (8 + Math.random() * 8) + 'px',
+        'height:' + (12 + Math.random() * 8) + 'px'
+      ].join(';');
+      document.body.appendChild(petal);
+      setTimeout(function(p) { p.remove(); }, 2000, petal);
+    }
+  }
+
+  // === Flower language ===
+  function detectFlowerType(name) {
+    var flowers = Object.keys(flowerLanguage);
+    for (var i = 0; i < flowers.length; i++) {
+      if (name.indexOf(flowers[i]) !== -1) return flowers[i];
+    }
+    return null;
+  }
+
+  // === Messages ===
   function addBotMessage(text) {
     var div = document.createElement('div');
     div.className = 'message bot';
-    div.innerHTML = '<div class="bubble">' + text + '</div>';
+    div.innerHTML = CONCIERGE_ICON + '<div class="bubble">' + text + '</div>';
     chat.appendChild(div);
     scrollToBottom();
   }
@@ -341,6 +586,7 @@ body {
       var btn = document.createElement('button');
       btn.textContent = opt;
       btn.addEventListener('click', function() {
+        createPetalEffect();
         div.remove();
         callback(opt);
       });
@@ -354,8 +600,8 @@ body {
     var div = document.createElement('div');
     div.className = 'message bot';
     div.id = 'loading';
-    div.innerHTML = '<div class="bubble"><div class="loading">'
-      + '<span style="font-size:0.85rem">素敵なお花を探しています...</span>'
+    div.innerHTML = CONCIERGE_ICON + '<div class="bubble"><div class="loading">'
+      + '<span style="font-size:0.85rem">素敵なお花を探しています</span>'
       + '<div class="loading-dots"><span></span><span></span><span></span></div>'
       + '</div></div>';
     chat.appendChild(div);
@@ -367,6 +613,28 @@ body {
     if (el) el.remove();
   }
 
+  // === Seasonal banner ===
+  function showSeasonalBanner() {
+    var month = new Date().getMonth() + 1;
+    var flower = seasonalFlowers[month];
+    if (!flower) return;
+
+    var div = document.createElement('div');
+    div.className = 'seasonal-banner';
+    div.innerHTML = '<div class="seasonal-title">' + flower.emoji + ' 今月のおすすめ: ' + escapeHtml(flower.name) + '</div>'
+      + '<div class="seasonal-desc">' + escapeHtml(flower.desc) + '</div>';
+    div.addEventListener('click', function() {
+      div.remove();
+      answers.purpose = '';
+      currentStep = 0;
+      // Search with the seasonal flower name as freeword
+      submitSearchDirect(flower.name);
+    });
+    chat.appendChild(div);
+    scrollToBottom();
+  }
+
+  // === Products ===
   function showProducts(products) {
     var div = document.createElement('div');
     div.className = 'products';
@@ -384,6 +652,16 @@ body {
         linkHtml = '<a class="product-link" href="' + escapeHtml(p.rakuten_url) + '" target="_blank" rel="noopener">楽天市場で見る &rarr;</a>';
       }
 
+      // Flower language
+      var langHtml = '';
+      var flowerType = detectFlowerType(p.name);
+      if (flowerType && flowerLanguage[flowerType]) {
+        langHtml = '<div class="flower-language">'
+          + '<span class="language-badge">花言葉</span>'
+          + '<span class="language-text">' + escapeHtml(flowerLanguage[flowerType].general) + '</span>'
+          + '</div>';
+      }
+
       var card = document.createElement('div');
       card.className = 'product-card';
       card.innerHTML = '<div class="product-image">' + imageHtml + '</div>'
@@ -391,6 +669,7 @@ body {
         + '<div class="product-name">' + escapeHtml(cleanProductName(p.name)) + '</div>'
         + '<div class="product-price">&yen;' + Number(p.price).toLocaleString() + '</div>'
         + '<div class="product-reason">' + escapeHtml(p.reason || '') + '</div>'
+        + langHtml
         + linkHtml
         + '</div>';
       div.appendChild(card);
@@ -413,6 +692,32 @@ body {
     scrollToBottom();
   }
 
+  // === Case studies ===
+  function showCaseStudies() {
+    var section = document.createElement('div');
+    section.className = 'cases-section';
+    var title = document.createElement('div');
+    title.className = 'cases-title';
+    title.textContent = '\uD83D\uDC90 銀座東京フラワーの贈り物事例';
+    section.appendChild(title);
+
+    var scroll = document.createElement('div');
+    scroll.className = 'cases-scroll';
+    caseStudies.forEach(function(c) {
+      var card = document.createElement('div');
+      card.className = 'case-card';
+      card.innerHTML = '<div class="case-emoji">' + c.emoji + '</div>'
+        + '<div class="case-title">' + escapeHtml(c.title) + '</div>'
+        + '<div class="case-desc">' + escapeHtml(c.desc) + '</div>'
+        + '<span class="case-tag">' + escapeHtml(c.tag) + '</span>';
+      scroll.appendChild(card);
+    });
+    section.appendChild(scroll);
+    chat.appendChild(section);
+    scrollToBottom();
+  }
+
+  // === Utilities ===
   function cleanProductName(name) {
     return name
       .replace(/【[^】]*】/g, '')
@@ -434,10 +739,11 @@ body {
 
   function scrollToBottom() {
     requestAnimationFrame(function() {
-      chat.scrollTop = chat.scrollHeight;
+      chat.scrollTo({ top: chat.scrollHeight, behavior: 'smooth' });
     });
   }
 
+  // === Flow ===
   function askQuestion(step) {
     var q = QUESTIONS[step];
     addBotMessage(q.text);
@@ -466,6 +772,21 @@ body {
       freeword: ''
     };
 
+    doSearch(payload);
+  }
+
+  function submitSearchDirect(flowerName) {
+    showLoading();
+    doSearch({
+      purpose: '',
+      budget: 99999,
+      recipient: '',
+      category: '',
+      freeword: flowerName
+    });
+  }
+
+  function doSearch(payload) {
     var url = new URL(API_URL);
     url.searchParams.set('purpose', payload.purpose || '');
     url.searchParams.set('budget', payload.budget || 99999);
@@ -487,6 +808,7 @@ body {
         addBotMessage('申し訳ございません。条件に合うお花が見つかりませんでした。条件を変えてお試しください。');
       }
       showRestart();
+      showCaseStudies();
     })
     .catch(function() {
       removeLoading();
@@ -500,7 +822,10 @@ body {
     currentStep = 0;
     answers = {};
     addBotMessage('いらっしゃいませ。銀座東京フラワーのフラワーコンシェルジュでございます。<br>お花選びのお手伝いをさせていただきます。');
-    setTimeout(function() { askQuestion(0); }, 500);
+    setTimeout(function() {
+      showSeasonalBanner();
+      setTimeout(function() { askQuestion(0); }, 300);
+    }, 500);
   }
 
   // 初期表示
