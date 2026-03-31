@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>管理画面 | 銀座東京フラワー</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>💐</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --bg: #1a2e1a; --bg-light: #243524; --gold: #c9a84c; --gold-light: #d4b96a;
+  --text: #f0ede6; --text-muted: #b0ab9e; --card-bg: #1e331e; --border: rgba(201,168,76,0.2);
+  --danger: #c94c4c;
+}
+body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+/* Login */
+.login-wrap { display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+.login-box { background: var(--bg-light); border: 1px solid var(--border); border-radius: 12px; padding: 40px; text-align: center; width: 360px; }
+.login-box h1 { font-family: 'Noto Serif JP', serif; color: var(--gold); font-size: 1.2rem; margin-bottom: 24px; }
+.login-box input { width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); font-size: 0.9rem; margin-bottom: 16px; font-family: inherit; }
+.login-box button { width: 100%; padding: 10px; background: var(--gold); color: var(--bg); border: none; border-radius: 8px; font-size: 0.9rem; font-weight: 700; cursor: pointer; font-family: inherit; }
+.login-box button:hover { background: var(--gold-light); }
+.login-error { color: var(--danger); font-size: 0.8rem; margin-top: 8px; }
+
+/* Header */
+.header { display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; border-bottom: 1px solid var(--border); }
+.header h1 { font-family: 'Noto Serif JP', serif; font-size: 1.1rem; color: var(--gold); }
+.header button { background: transparent; border: 1px solid var(--border); color: var(--text-muted); padding: 6px 14px; border-radius: 6px; font-size: 0.8rem; cursor: pointer; font-family: inherit; }
+.header button:hover { color: var(--gold); border-color: var(--gold); }
+
+/* Tabs */
+.tabs { display: flex; border-bottom: 1px solid var(--border); padding: 0 24px; }
+.tabs button { background: transparent; border: none; color: var(--text-muted); padding: 12px 20px; font-size: 0.85rem; cursor: pointer; border-bottom: 2px solid transparent; font-family: inherit; }
+.tabs button.active { color: var(--gold); border-bottom-color: var(--gold); }
+.tabs button:hover { color: var(--gold-light); }
+
+/* Content */
+.content { padding: 24px; max-width: 1100px; margin: 0 auto; }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+.panel-desc { color: var(--text-muted); font-size: 0.85rem; margin-bottom: 16px; }
+
+/* Table */
+table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+th { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); color: var(--gold); font-size: 0.8rem; font-weight: 500; }
+td { padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.85rem; }
+.empty-msg { color: var(--text-muted); font-size: 0.85rem; padding: 20px 0; }
+
+/* Forms */
+.form-row { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; margin-top: 16px; padding: 16px; background: var(--bg-light); border-radius: 8px; border: 1px solid var(--border); }
+.form-group { display: flex; flex-direction: column; gap: 4px; }
+.form-group label { font-size: 0.75rem; color: var(--text-muted); }
+.form-group select, .form-group input, .form-group textarea {
+  padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px;
+  background: var(--bg); color: var(--text); font-size: 0.85rem; font-family: inherit;
+}
+.form-group select { min-width: 160px; }
+.form-group input { min-width: 160px; }
+.form-group textarea { min-width: 300px; min-height: 60px; resize: vertical; }
+
+.btn { padding: 8px 18px; border: none; border-radius: 6px; font-size: 0.85rem; cursor: pointer; font-weight: 700; font-family: inherit; }
+.btn-gold { background: var(--gold); color: var(--bg); }
+.btn-gold:hover { background: var(--gold-light); }
+.btn-danger { background: transparent; border: 1px solid var(--danger); color: var(--danger); padding: 4px 10px; font-size: 0.75rem; }
+.btn-danger:hover { background: var(--danger); color: #fff; }
+.btn-small { padding: 4px 10px; font-size: 0.75rem; }
+.btn-cancel { background: transparent; border: 1px solid var(--border); color: var(--text-muted); }
+
+/* Product search dropdown */
+.search-wrap { position: relative; }
+.search-dropdown { position: absolute; top: 100%; left: 0; right: 0; background: var(--bg-light); border: 1px solid var(--border); border-radius: 6px; max-height: 200px; overflow-y: auto; z-index: 10; display: none; }
+.search-dropdown.show { display: block; }
+.search-dropdown div { padding: 8px 10px; font-size: 0.8rem; cursor: pointer; }
+.search-dropdown div:hover { background: var(--bg); color: var(--gold); }
+.selected-product { font-size: 0.8rem; color: var(--gold); margin-top: 4px; }
+
+/* Inline edit */
+.hint-edit { display: flex; gap: 8px; align-items: flex-start; }
+.hint-edit textarea { flex: 1; padding: 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--text); font-size: 0.85rem; font-family: inherit; min-height: 50px; }
+
+/* Loading */
+.loading-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 100; }
+.loading-overlay span { color: var(--gold); font-size: 1rem; }
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<!-- Login -->
+<div id="loginScreen" class="login-wrap">
+  <div class="login-box">
+    <h1>銀座東京フラワー<br>コンシェルジュ管理画面</h1>
+    <input type="password" id="loginPass" placeholder="パスワード" onkeydown="if(event.key==='Enter')doLogin()">
+    <button onclick="doLogin()">管理画面にログイン</button>
+    <div id="loginError" class="login-error hidden"></div>
+  </div>
+</div>
+
+<!-- Admin -->
+<div id="adminScreen" class="hidden">
+  <div class="header">
+    <h1>銀座東京フラワー コンシェルジュ管理画面</h1>
+    <button onclick="doLogout()">ログアウト</button>
+  </div>
+  <div class="tabs">
+    <button class="active" onclick="switchTab(0)">除外ルール</button>
+    <button onclick="switchTab(1)">優遇ルール</button>
+    <button onclick="switchTab(2)">手動おすすめ商品</button>
+    <button onclick="switchTab(3)">プロンプトヒント</button>
+  </div>
+  <div class="content">
+
+    <!-- Tab 0: Exclude -->
+    <div id="tab0" class="tab-panel active">
+      <div id="excludeTable"></div>
+      <div class="form-row">
+        <div class="form-group"><label>用途</label><select id="exPurpose"></select></div>
+        <div class="form-group"><label>除外キーワード（カンマ区切り）</label><input id="exKeywords" placeholder="例: 肥料,マグァンプ,資材"></div>
+        <div class="form-group"><label>メモ</label><input id="exMemo"></div>
+        <button class="btn btn-gold" onclick="saveExclude()">追加</button>
+      </div>
+    </div>
+
+    <!-- Tab 1: Boost -->
+    <div id="tab1" class="tab-panel">
+      <div id="boostTable"></div>
+      <div class="form-row">
+        <div class="form-group"><label>用途</label><select id="boPurpose"></select></div>
+        <div class="form-group"><label>カテゴリ</label><select id="boCategory"></select></div>
+        <div class="form-group"><label>追加スコア</label><input id="boScore" type="number" value="10" min="1" max="50" style="min-width:80px"></div>
+        <div class="form-group"><label>メモ</label><input id="boMemo"></div>
+        <button class="btn btn-gold" onclick="saveBoost()">追加</button>
+      </div>
+    </div>
+
+    <!-- Tab 2: Pinned -->
+    <div id="tab2" class="tab-panel">
+      <p class="panel-desc">設定した条件に一致するとき、この商品を最優先で表示します</p>
+      <div id="pinnedTable"></div>
+      <div class="form-row">
+        <div class="form-group"><label>用途</label><select id="piPurpose"></select></div>
+        <div class="form-group"><label>予算上限（空欄=全予算）</label><input id="piBudget" type="number" style="min-width:120px"></div>
+        <div class="form-group search-wrap">
+          <label>商品検索</label>
+          <input id="piSearch" placeholder="商品名で検索" oninput="debounceSearch()">
+          <div id="piDropdown" class="search-dropdown"></div>
+          <div id="piSelected" class="selected-product"></div>
+        </div>
+        <div class="form-group"><label>優先度</label>
+          <select id="piPriority"><option>最優先</option><option>高</option><option selected>中</option></select>
+        </div>
+        <div class="form-group"><label>メモ</label><input id="piMemo"></div>
+        <button class="btn btn-gold" onclick="savePinned()">追加</button>
+      </div>
+    </div>
+
+    <!-- Tab 3: Hints -->
+    <div id="tab3" class="tab-panel">
+      <p class="panel-desc">各用途のときにAIに渡す追加指示です。空欄の場合はデフォルト動作になります</p>
+      <div id="hintsTable"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Loading -->
+<div id="loadingOverlay" class="loading-overlay hidden"><span>処理中...</span></div>
+
+<script>
+(function() {
+  var GAS_ADMIN_ENDPOINT = 'GAS_ADMIN_URL_HERE';
+
+  var PURPOSES = ['誕生日','記念日・お祝い','開店・開業祝い','お見舞い','母の日・父の日','結婚・出産祝い','就任・栄転祝い','自宅用・インテリア','全用途共通'];
+  var CATEGORIES = ['切り花・花束','アレンジメント','鉢植え・観葉植物','花鉢・鉢物','スタンド花','胡蝶蘭'];
+
+  var rulesData = { exclude: [], boost: [], pinned: [], hints: [] };
+  var selectedProduct = null;
+  var searchTimer = null;
+
+  // === Init ===
+  window.addEventListener('DOMContentLoaded', function() {
+    fillSelects('exPurpose', PURPOSES);
+    fillSelects('boPurpose', PURPOSES);
+    fillSelects('piPurpose', PURPOSES);
+    fillSelects('boCategory', CATEGORIES);
+
+    if (sessionStorage.getItem('adminPass')) {
+      showAdmin();
+    }
+  });
+
+  function fillSelects(id, options) {
+    var sel = document.getElementById(id);
+    options.forEach(function(o) {
+      var opt = document.createElement('option');
+      opt.value = o; opt.textContent = o;
+      sel.appendChild(opt);
+    });
+  }
+
+  // === Auth ===
+  window.doLogin = function() {
+    var pass = document.getElementById('loginPass').value;
+    if (!pass) return;
+    showLoading();
+    apiCall({ action: 'auth', password: pass }, function(data) {
+      hideLoading();
+      if (data.status === 'ok') {
+        sessionStorage.setItem('adminPass', pass);
+        showAdmin();
+      } else {
+        var el = document.getElementById('loginError');
+        el.textContent = data.message || '認証失敗';
+        el.classList.remove('hidden');
+      }
+    });
+  };
+
+  window.doLogout = function() {
+    sessionStorage.removeItem('adminPass');
+    document.getElementById('adminScreen').classList.add('hidden');
+    document.getElementById('loginScreen').classList.remove('hidden');
+    document.getElementById('loginPass').value = '';
+    document.getElementById('loginError').classList.add('hidden');
+  };
+
+  function showAdmin() {
+    document.getElementById('loginScreen').classList.add('hidden');
+    document.getElementById('adminScreen').classList.remove('hidden');
+    loadRules();
+  }
+
+  // === Tabs ===
+  window.switchTab = function(idx) {
+    var tabs = document.querySelectorAll('.tabs button');
+    var panels = document.querySelectorAll('.tab-panel');
+    tabs.forEach(function(t, i) { t.classList.toggle('active', i === idx); });
+    panels.forEach(function(p, i) { p.classList.toggle('active', i === idx); });
+  };
+
+  // === API ===
+  function apiCall(body, cb) {
+    body.password = body.password || sessionStorage.getItem('adminPass') || '';
+    fetch(GAS_ADMIN_ENDPOINT, {
+      method: 'POST',
+      redirect: 'follow',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(body)
+    })
+    .then(function(r) { return r.json(); })
+    .then(cb)
+    .catch(function(e) { hideLoading(); alert('通信エラー: ' + e.message); });
+  }
+
+  function showLoading() { document.getElementById('loadingOverlay').classList.remove('hidden'); }
+  function hideLoading() { document.getElementById('loadingOverlay').classList.add('hidden'); }
+
+  // === Load Rules ===
+  function loadRules() {
+    showLoading();
+    apiCall({ action: 'get_rules' }, function(data) {
+      hideLoading();
+      if (data.status !== 'ok') { alert(data.message || 'エラー'); return; }
+      rulesData = data;
+      renderExclude();
+      renderBoost();
+      renderPinned();
+      renderHints();
+    });
+  }
+
+  // === Exclude ===
+  function renderExclude() {
+    var html = '<table><tr><th>用途</th><th>除外キーワード</th><th>メモ</th><th>操作</th></tr>';
+    if (rulesData.exclude.length === 0) {
+      html += '</table><p class="empty-msg">ルールがありません。下のフォームから追加してください。</p>';
+    } else {
+      rulesData.exclude.forEach(function(r) {
+        html += '<tr><td>' + esc(r.purpose) + '</td><td>' + esc(r.keywords) + '</td><td>' + esc(r.memo) + '</td>'
+          + '<td><button class="btn btn-danger" onclick="deleteRule(\'exclude\',' + JSON.stringify(String(r.id)) + ')">削除</button></td></tr>';
+      });
+      html += '</table>';
+    }
+    document.getElementById('excludeTable').innerHTML = html;
+  }
+
+  window.saveExclude = function() {
+    var kw = document.getElementById('exKeywords').value.trim();
+    if (!kw) { alert('キーワードを入力してください'); return; }
+    showLoading();
+    apiCall({
+      action: 'save_exclude',
+      purpose: document.getElementById('exPurpose').value,
+      keywords: kw,
+      memo: document.getElementById('exMemo').value
+    }, function(data) {
+      hideLoading();
+      if (data.status === 'ok') { document.getElementById('exKeywords').value = ''; document.getElementById('exMemo').value = ''; loadRules(); }
+      else alert(data.message);
+    });
+  };
+
+  // === Boost ===
+  function renderBoost() {
+    var html = '<table><tr><th>用途</th><th>優遇カテゴリ</th><th>追加スコア</th><th>メモ</th><th>操作</th></tr>';
+    if (rulesData.boost.length === 0) {
+      html += '</table><p class="empty-msg">ルールがありません。下のフォームから追加してください。</p>';
+    } else {
+      rulesData.boost.forEach(function(r) {
+        html += '<tr><td>' + esc(r.purpose) + '</td><td>' + esc(r.category) + '</td><td>' + esc(r.score) + '</td><td>' + esc(r.memo) + '</td>'
+          + '<td><button class="btn btn-danger" onclick="deleteRule(\'boost\',' + JSON.stringify(String(r.id)) + ')">削除</button></td></tr>';
+      });
+      html += '</table>';
+    }
+    document.getElementById('boostTable').innerHTML = html;
+  }
+
+  window.saveBoost = function() {
+    showLoading();
+    apiCall({
+      action: 'save_boost',
+      purpose: document.getElementById('boPurpose').value,
+      category: document.getElementById('boCategory').value,
+      score: document.getElementById('boScore').value,
+      memo: document.getElementById('boMemo').value
+    }, function(data) {
+      hideLoading();
+      if (data.status === 'ok') { document.getElementById('boMemo').value = ''; loadRules(); }
+      else alert(data.message);
+    });
+  };
+
+  // === Pinned ===
+  function renderPinned() {
+    var html = '<table><tr><th>用途</th><th>予算上限</th><th>商品名</th><th>優先度</th><th>メモ</th><th>操作</th></tr>';
+    if (rulesData.pinned.length === 0) {
+      html += '</table><p class="empty-msg">ルールがありません。下のフォームから追加してください。</p>';
+    } else {
+      rulesData.pinned.forEach(function(r) {
+        html += '<tr><td>' + esc(r.purpose) + '</td><td>' + (r.budget_max || '全予算') + '</td><td>' + esc(r.product_name) + '</td>'
+          + '<td>' + esc(r.priority) + '</td><td>' + esc(r.memo) + '</td>'
+          + '<td><button class="btn btn-danger" onclick="deleteRule(\'pinned\',' + JSON.stringify(String(r.id)) + ')">削除</button></td></tr>';
+      });
+      html += '</table>';
+    }
+    document.getElementById('pinnedTable').innerHTML = html;
+  }
+
+  window.savePinned = function() {
+    if (!selectedProduct) { alert('商品を検索して選択してください'); return; }
+    showLoading();
+    apiCall({
+      action: 'save_pinned',
+      purpose: document.getElementById('piPurpose').value,
+      budget_max: document.getElementById('piBudget').value || '',
+      product_id: selectedProduct.id,
+      product_name: selectedProduct.name,
+      priority: document.getElementById('piPriority').value,
+      memo: document.getElementById('piMemo').value
+    }, function(data) {
+      hideLoading();
+      if (data.status === 'ok') {
+        selectedProduct = null;
+        document.getElementById('piSearch').value = '';
+        document.getElementById('piSelected').textContent = '';
+        document.getElementById('piMemo').value = '';
+        document.getElementById('piBudget').value = '';
+        loadRules();
+      } else alert(data.message);
+    });
+  };
+
+  // Product search
+  window.debounceSearch = function() {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(function() {
+      var kw = document.getElementById('piSearch').value.trim();
+      if (kw.length < 2) { document.getElementById('piDropdown').classList.remove('show'); return; }
+      apiCall({ action: 'search_products', keyword: kw }, function(data) {
+        var dd = document.getElementById('piDropdown');
+        if (!data.products || data.products.length === 0) { dd.classList.remove('show'); return; }
+        dd.innerHTML = '';
+        data.products.forEach(function(p) {
+          var d = document.createElement('div');
+          d.textContent = p.name + ' (\u00A5' + Number(p.price).toLocaleString() + ')';
+          d.addEventListener('click', function() {
+            selectedProduct = { id: p.id, name: p.name };
+            document.getElementById('piSelected').textContent = '\u9078\u629E\u4E2D: ' + p.name;
+            document.getElementById('piSearch').value = p.name;
+            dd.classList.remove('show');
+          });
+          dd.appendChild(d);
+        });
+        dd.classList.add('show');
+      });
+    }, 300);
+  };
+
+  // === Hints ===
+  function renderHints() {
+    var allPurposes = ['誕生日','記念日・お祝い','開店・開業祝い','お見舞い','母の日・父の日','結婚・出産祝い','就任・栄転祝い','自宅用・インテリア'];
+    var hintMap = {};
+    var hintIdMap = {};
+    rulesData.hints.forEach(function(h) { hintMap[h.purpose] = h.hint; hintIdMap[h.purpose] = h.id; });
+
+    var html = '<table><tr><th>用途</th><th>現在の指示文</th><th>操作</th></tr>';
+    allPurposes.forEach(function(p) {
+      var hint = hintMap[p] || '';
+      html += '<tr id="hint-row-' + esc(p) + '"><td>' + esc(p) + '</td>'
+        + '<td class="hint-text">' + (hint ? esc(hint) : '<span style="color:var(--text-muted)">（未設定）</span>') + '</td>'
+        + '<td><button class="btn btn-small btn-gold" onclick="editHint(' + JSON.stringify(p) + ',' + JSON.stringify(hint) + ')">編集</button></td></tr>';
+    });
+    html += '</table>';
+    document.getElementById('hintsTable').innerHTML = html;
+  }
+
+  window.editHint = function(purpose, current) {
+    var row = document.getElementById('hint-row-' + purpose);
+    if (!row) return;
+    var cells = row.querySelectorAll('td');
+    cells[1].innerHTML = '<div class="hint-edit"><textarea id="hintEdit-' + purpose + '">' + esc(current) + '</textarea></div>';
+    cells[2].innerHTML = '<button class="btn btn-small btn-gold" onclick="saveHint(' + JSON.stringify(purpose) + ')">保存</button> '
+      + '<button class="btn btn-small btn-cancel" onclick="renderHints()">キャンセル</button>';
+  };
+
+  window.saveHint = function(purpose) {
+    var ta = document.getElementById('hintEdit-' + purpose);
+    if (!ta) return;
+    showLoading();
+    apiCall({ action: 'save_hint', purpose: purpose, hint: ta.value }, function(data) {
+      hideLoading();
+      if (data.status === 'ok') loadRules();
+      else alert(data.message);
+    });
+  };
+
+  // === Delete ===
+  window.deleteRule = function(type, id) {
+    if (!confirm('削除してよろしいですか？')) return;
+    showLoading();
+    apiCall({ action: 'delete_' + type, id: id }, function(data) {
+      hideLoading();
+      if (data.status === 'ok') loadRules();
+      else alert(data.message);
+    });
+  };
+
+  // === Util ===
+  function esc(s) {
+    var d = document.createElement('div');
+    d.appendChild(document.createTextNode(String(s || '')));
+    return d.innerHTML;
+  }
+})();
+</script>
+</body>
+</html>
