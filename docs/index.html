@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>フラワーコンシェルジュ | 銀座東京フラワー</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #1a2e1a;
+  --bg-light: #243524;
+  --gold: #c9a84c;
+  --gold-light: #d4b96a;
+  --gold-dark: #a88a3a;
+  --text: #f0ede6;
+  --text-muted: #b0ab9e;
+  --card-bg: #1e331e;
+  --bubble-user: #2a4a2a;
+  --bubble-bot: #243524;
+}
+
+body {
+  font-family: 'Noto Sans JP', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header */
+.header {
+  text-align: center;
+  padding: 24px 16px 16px;
+  border-bottom: 1px solid rgba(201,168,76,0.2);
+}
+.header h1 {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--gold);
+  letter-spacing: 0.1em;
+}
+.header p {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+  letter-spacing: 0.05em;
+}
+
+/* Chat area */
+.chat-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 600px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* Message bubbles */
+.message {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  animation: fadeIn 0.3s ease;
+}
+.message.bot { justify-content: flex-start; }
+.message.user { justify-content: flex-end; }
+
+.bubble {
+  max-width: 80%;
+  padding: 12px 16px;
+  border-radius: 16px;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+.message.bot .bubble {
+  background: var(--bubble-bot);
+  border-bottom-left-radius: 4px;
+}
+.message.user .bubble {
+  background: var(--bubble-user);
+  border-bottom-right-radius: 4px;
+  color: var(--gold-light);
+}
+
+/* Choice buttons */
+.choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 4px 0;
+  animation: fadeIn 0.3s ease;
+}
+.choices button {
+  font-family: 'Noto Sans JP', sans-serif;
+  background: transparent;
+  border: 1px solid var(--gold);
+  color: var(--gold);
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.choices button:hover {
+  background: var(--gold);
+  color: var(--bg);
+}
+
+/* Loading */
+.loading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  animation: fadeIn 0.3s ease;
+}
+.loading-dots {
+  display: flex;
+  gap: 4px;
+}
+.loading-dots span {
+  width: 6px;
+  height: 6px;
+  background: var(--gold);
+  border-radius: 50%;
+  animation: bounce 1.2s infinite;
+}
+.loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+.loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+/* Product cards */
+.products {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 8px 0;
+  animation: fadeIn 0.4s ease;
+}
+.product-card {
+  background: var(--card-bg);
+  border: 1px solid rgba(201,168,76,0.15);
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  gap: 0;
+}
+.product-image {
+  width: 110px;
+  min-height: 130px;
+  flex-shrink: 0;
+  background: #152015;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.product-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.product-image svg {
+  width: 48px;
+  height: 48px;
+  opacity: 0.4;
+}
+.product-info {
+  flex: 1;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.product-name {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.product-price {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--gold);
+}
+.product-reason {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+.product-link {
+  display: inline-block;
+  margin-top: auto;
+  padding: 6px 14px;
+  background: var(--gold);
+  color: var(--bg);
+  text-decoration: none;
+  font-size: 0.78rem;
+  font-weight: 700;
+  border-radius: 6px;
+  text-align: center;
+  transition: background 0.2s;
+  align-self: flex-start;
+}
+.product-link:hover {
+  background: var(--gold-light);
+}
+
+/* Restart button */
+.restart {
+  text-align: center;
+  padding: 8px 0;
+  animation: fadeIn 0.3s ease;
+}
+.restart button {
+  font-family: 'Noto Sans JP', sans-serif;
+  background: transparent;
+  border: 1px solid var(--gold);
+  color: var(--gold);
+  padding: 10px 24px;
+  border-radius: 24px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.restart button:hover {
+  background: var(--gold);
+  color: var(--bg);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes bounce {
+  0%, 60%, 100% { transform: translateY(0); }
+  30% { transform: translateY(-6px); }
+}
+
+/* Scrollbar */
+.chat-container::-webkit-scrollbar { width: 4px; }
+.chat-container::-webkit-scrollbar-track { background: transparent; }
+.chat-container::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.3); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Flower Concierge</h1>
+  <p>銀座東京フラワー フラワーコンシェルジュ</p>
+</div>
+
+<div class="chat-container" id="chat"></div>
+
+<script>
+(function() {
+  var API_URL = 'https://script.google.com/macros/s/AKfycbyCqy30FvmaEOrnRzKqODEYUokVdNQKMnTPaWILpG4aAxqueoIT9AXNGEfSOdXwoJKK/exec';
+
+  var QUESTIONS = [
+    {
+      key: 'purpose',
+      text: 'どのようなご用途でお花をお探しですか？',
+      options: ['誕生日', '記念日・お祝い', '開店・開業祝い', 'お見舞い', '母の日・父の日', '結婚・出産祝い', '就任・栄転祝い', '自宅用・インテリア']
+    },
+    {
+      key: 'recipient',
+      text: 'どなたへのお花ですか？',
+      options: ['恋人・パートナー', '家族', '友人・知人', '職場の方・上司', 'お客様・取引先', '自分用']
+    },
+    {
+      key: 'budget',
+      text: 'ご予算はいかがでしょうか？',
+      options: ['3,000円前後', '5,000円前後', '10,000円前後', '20,000円前後', '30,000円以上']
+    },
+    {
+      key: 'category',
+      text: 'お花のタイプはご希望がございますか？',
+      options: ['花束・切り花', 'アレンジメント', '鉢植え・観葉植物', '胡蝶蘭', 'スタンド花', 'おまかせ']
+    }
+  ];
+
+  var BUDGET_MAP = {
+    '3,000円前後': 3500,
+    '5,000円前後': 5500,
+    '10,000円前後': 10000,
+    '20,000円前後': 20000,
+    '30,000円以上': 99999
+  };
+
+  var chat = document.getElementById('chat');
+  var currentStep = 0;
+  var answers = {};
+
+  var FLOWER_SVG = '<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">'
+    + '<path d="M24 40V24" stroke="#c9a84c" stroke-width="2" stroke-linecap="round"/>'
+    + '<path d="M20 40C20 40 16 36 16 34" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round"/>'
+    + '<path d="M28 40C28 40 32 36 32 34" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round"/>'
+    + '<circle cx="24" cy="18" r="4" fill="#c9a84c" opacity="0.6"/>'
+    + '<ellipse cx="24" cy="12" rx="3.5" ry="5" fill="#c9a84c" opacity="0.3"/>'
+    + '<ellipse cx="18" cy="16" rx="3.5" ry="5" transform="rotate(-45 18 16)" fill="#c9a84c" opacity="0.3"/>'
+    + '<ellipse cx="30" cy="16" rx="3.5" ry="5" transform="rotate(45 30 16)" fill="#c9a84c" opacity="0.3"/>'
+    + '<ellipse cx="19" cy="22" rx="3.5" ry="5" transform="rotate(-90 19 22)" fill="#c9a84c" opacity="0.3"/>'
+    + '<ellipse cx="29" cy="22" rx="3.5" ry="5" transform="rotate(90 29 22)" fill="#c9a84c" opacity="0.3"/>'
+    + '</svg>';
+
+  function addBotMessage(text) {
+    var div = document.createElement('div');
+    div.className = 'message bot';
+    div.innerHTML = '<div class="bubble">' + text + '</div>';
+    chat.appendChild(div);
+    scrollToBottom();
+  }
+
+  function addUserMessage(text) {
+    var div = document.createElement('div');
+    div.className = 'message user';
+    div.innerHTML = '<div class="bubble">' + text + '</div>';
+    chat.appendChild(div);
+    scrollToBottom();
+  }
+
+  function addChoices(options, callback) {
+    var div = document.createElement('div');
+    div.className = 'choices';
+    options.forEach(function(opt) {
+      var btn = document.createElement('button');
+      btn.textContent = opt;
+      btn.addEventListener('click', function() {
+        div.remove();
+        callback(opt);
+      });
+      div.appendChild(btn);
+    });
+    chat.appendChild(div);
+    scrollToBottom();
+  }
+
+  function showLoading() {
+    var div = document.createElement('div');
+    div.className = 'message bot';
+    div.id = 'loading';
+    div.innerHTML = '<div class="bubble"><div class="loading">'
+      + '<span style="font-size:0.85rem">素敵なお花を探しています...</span>'
+      + '<div class="loading-dots"><span></span><span></span><span></span></div>'
+      + '</div></div>';
+    chat.appendChild(div);
+    scrollToBottom();
+  }
+
+  function removeLoading() {
+    var el = document.getElementById('loading');
+    if (el) el.remove();
+  }
+
+  function showProducts(products) {
+    var div = document.createElement('div');
+    div.className = 'products';
+
+    products.forEach(function(p) {
+      var imageHtml;
+      if (p.image_url) {
+        imageHtml = '<img src="' + escapeHtml(p.image_url) + '" alt="' + escapeHtml(p.name) + '">';
+      } else {
+        imageHtml = FLOWER_SVG;
+      }
+
+      var linkHtml = '';
+      if (p.rakuten_url) {
+        linkHtml = '<a class="product-link" href="' + escapeHtml(p.rakuten_url) + '" target="_blank" rel="noopener">楽天市場で見る &rarr;</a>';
+      }
+
+      var card = document.createElement('div');
+      card.className = 'product-card';
+      card.innerHTML = '<div class="product-image">' + imageHtml + '</div>'
+        + '<div class="product-info">'
+        + '<div class="product-name">' + escapeHtml(p.name) + '</div>'
+        + '<div class="product-price">&yen;' + Number(p.price).toLocaleString() + '</div>'
+        + '<div class="product-reason">' + escapeHtml(p.reason || '') + '</div>'
+        + linkHtml
+        + '</div>';
+      div.appendChild(card);
+    });
+
+    chat.appendChild(div);
+    scrollToBottom();
+  }
+
+  function showRestart() {
+    var div = document.createElement('div');
+    div.className = 'restart';
+    var btn = document.createElement('button');
+    btn.textContent = 'もう一度探す';
+    btn.addEventListener('click', function() {
+      startOver();
+    });
+    div.appendChild(btn);
+    chat.appendChild(div);
+    scrollToBottom();
+  }
+
+  function escapeHtml(str) {
+    var d = document.createElement('div');
+    d.appendChild(document.createTextNode(str));
+    return d.innerHTML;
+  }
+
+  function scrollToBottom() {
+    requestAnimationFrame(function() {
+      chat.scrollTop = chat.scrollHeight;
+    });
+  }
+
+  function askQuestion(step) {
+    var q = QUESTIONS[step];
+    addBotMessage(q.text);
+    addChoices(q.options, function(selected) {
+      addUserMessage(selected);
+      answers[q.key] = selected;
+      currentStep++;
+      if (currentStep < QUESTIONS.length) {
+        setTimeout(function() { askQuestion(currentStep); }, 300);
+      } else {
+        setTimeout(function() { submitSearch(); }, 300);
+      }
+    });
+  }
+
+  function submitSearch() {
+    showLoading();
+
+    var categoryValue = answers.category === 'おまかせ' ? '' : answers.category;
+
+    var payload = {
+      purpose: answers.purpose,
+      budget: BUDGET_MAP[answers.budget] || 5500,
+      recipient: answers.recipient,
+      category: categoryValue,
+      freeword: ''
+    };
+
+    fetch(API_URL, {
+      method: 'POST',
+      redirect: 'follow',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload)
+    })
+    .then(function(res) { return res.json(); })
+    .then(function(data) {
+      removeLoading();
+      if (data.status === 'ok' && data.products && data.products.length > 0) {
+        addBotMessage('お客様にぴったりのお花をお選びいたしました。');
+        showProducts(data.products);
+      } else {
+        addBotMessage('申し訳ございません。条件に合うお花が見つかりませんでした。条件を変えてお試しください。');
+      }
+      showRestart();
+    })
+    .catch(function() {
+      removeLoading();
+      addBotMessage('通信エラーが発生しました。お手数ですがもう一度お試しください。');
+      showRestart();
+    });
+  }
+
+  function startOver() {
+    chat.innerHTML = '';
+    currentStep = 0;
+    answers = {};
+    addBotMessage('いらっしゃいませ。銀座東京フラワーのフラワーコンシェルジュでございます。<br>お花選びのお手伝いをさせていただきます。');
+    setTimeout(function() { askQuestion(0); }, 500);
+  }
+
+  // 初期表示
+  startOver();
+})();
+</script>
+</body>
+</html>
