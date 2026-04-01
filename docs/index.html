@@ -802,7 +802,15 @@ body::before {
     .then(function(data) {
       removeLoading();
       if (data.status === 'ok' && data.products && data.products.length > 0) {
-        addBotMessage('お客様にぴったりのお花をお選びいたしました。');
+        var ALCOHOL_KW = ['ワイン', 'スパークリング', 'シャンパン', 'ビール', '日本酒', '焼酎'];
+        var hasWineSet = data.products.some(function(p) {
+          return ALCOHOL_KW.some(function(kw) { return (p.name || '').indexOf(kw) !== -1; });
+        });
+        if (hasWineSet) {
+          addBotMessage('お客様にぴったりのお花をお選びいたしました。<br>ワインとのセットなど、特別感のある贈り物もご提案しております。');
+        } else {
+          addBotMessage('お客様にぴったりのお花をお選びいたしました。');
+        }
         showProducts(data.products);
       } else {
         addBotMessage('申し訳ございません。条件に合うお花が見つかりませんでした。条件を変えてお試しください。');
