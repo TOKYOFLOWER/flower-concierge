@@ -302,6 +302,45 @@ body::before {
   transform: translateY(-1px);
 }
 
+/* Back button */
+.back-button {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: rgba(255, 255, 255, 0.7);
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 13px;
+  cursor: pointer;
+  margin-bottom: 8px;
+  font-family: 'Noto Sans JP', sans-serif;
+  transition: all 0.2s;
+}
+.back-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+/* More products button */
+.more-products-button {
+  display: block;
+  margin: 16px auto;
+  padding: 10px 32px;
+  background: transparent;
+  border: 1px solid var(--gold);
+  color: var(--gold);
+  border-radius: 24px;
+  font-size: 14px;
+  font-family: 'Noto Sans JP', sans-serif;
+  cursor: pointer;
+  transition: all 0.3s;
+  animation: fadeIn 0.4s ease;
+}
+.more-products-button:hover {
+  background: var(--gold);
+  color: var(--bg);
+  transform: translateY(-1px);
+}
+
 /* Restart button */
 .restart {
   text-align: center;
@@ -511,6 +550,7 @@ body::before {
   var chat = document.getElementById('chat');
   var currentStep = 0;
   var answers = {};
+  var chatHistory = [];
 
   var CONCIERGE_ICON = '<svg class="concierge-icon" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">'
     + '<circle cx="20" cy="20" r="20" fill="#c9a84c"/>'
@@ -744,9 +784,46 @@ body::before {
   }
 
   // === Flow ===
+  function goBack() {
+    if (chatHistory.length <= 1) return;
+    chatHistory.pop();
+    var prevState = chatHistory[chatHistory.length - 1];
+
+    // 前のステップ以降のDOM要素を削除
+    var children = chat.children;
+    while (children.length > prevState.messageCount) {
+      chat.removeChild(children[children.length - 1]);
+    }
+
+    // 状態を復元
+    currentStep = prevState.step;
+    delete answers[QUESTIONS[currentStep].key];
+    chatHistory.pop(); // askQuestionで再pushされるので削除
+
+    askQuestion(currentStep);
+  }
+
   function askQuestion(step) {
     var q = QUESTIONS[step];
+    chatHistory.push({
+      step: step,
+      messageCount: chat.children.length
+    });
+
     addBotMessage(q.text);
+
+    // 2問目以降に戻るボタンを表示
+    if (step > 0) {
+      var backBtn = document.createElement('button');
+      backBtn.className = 'back-button';
+      backBtn.textContent = '\u2190 \u623B\u308B';
+      backBtn.addEventListener('click', function() {
+        createPetalEffect();
+        goBack();
+      });
+      chat.appendChild(backBtn);
+    }
+
     addChoices(q.options, function(selected) {
       addUserMessage(selected);
       answers[q.key] = selected;
@@ -812,6 +889,19 @@ body::before {
           addBotMessage('お客様にぴったりのお花をお選びいたしました。');
         }
         showProducts(data.products);
+        // extra_productsがあれば「もっと見る」ボタンを表示
+        if (data.extra_products && data.extra_products.length > 0) {
+          var moreBtn = document.createElement('button');
+          moreBtn.className = 'more-products-button';
+          moreBtn.textContent = '\u3082\u3063\u3068\u898B\u308B \u25BC';
+          moreBtn.addEventListener('click', function() {
+            createPetalEffect();
+            showProducts(data.extra_products);
+            moreBtn.remove();
+            scrollToBottom();
+          });
+          chat.appendChild(moreBtn);
+        }
       } else {
         addBotMessage('申し訳ございません。条件に合うお花が見つかりませんでした。条件を変えてお試しください。');
       }
@@ -829,6 +919,7 @@ body::before {
     chat.innerHTML = '';
     currentStep = 0;
     answers = {};
+    chatHistory = [];
     addBotMessage('いらっしゃいませ。銀座東京フラワーのフラワーコンシェルジュでございます。<br>お花選びのお手伝いをさせていただきます。');
     setTimeout(function() {
       showSeasonalBanner();
